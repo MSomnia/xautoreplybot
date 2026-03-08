@@ -1,0 +1,60 @@
+name: X Auto Reply Bot
+
+on:
+  schedule:
+    - cron: '*/10 * * * *'
+  workflow_dispatch:
+
+jobs:
+  reply:
+    runs-on: ubuntu-latest
+    concurrency:
+      group: reply-bot
+      cancel-in-progress: false
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Download state artifact
+        uses: dawidd6/action-download-artifact@v3
+        with:
+          name: bot-state
+          path: .
+          if_no_artifact_found: warn
+        continue-on-error: true
+
+      - name: Initialize state if needed
+        run: |
+          if [ ! -f state.json ]; then
+            echo '{"since_id": null, "last_run": null, "recent_replies": []}' > state.json
+          fi
+
+      - name: Run bot
+        env:
+          X_MAIN_USER_ID: ${{ secrets.X_MAIN_USER_ID }}
+          X_API_KEY: ${{ secrets.X_API_KEY }}
+          X_API_SECRET: ${{ secrets.X_API_SECRET }}
+          X_ACCESS_TOKEN: ${{ secrets.X_ACCESS_TOKEN }}
+          X_ACCESS_TOKEN_SECRET: ${{ secrets.X_ACCESS_TOKEN_SECRET }}
+          X_BEARER_TOKEN: ${{ secrets.X_BEARER_TOKEN }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          BOT_SYSTEM_PROMPT: ${{ secrets.BOT_SYSTEM_PROMPT }}
+        run: python main.py
+
+      - name: Upload state artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: bot-state
+          path: state.json
+          overwrite: true
+          retention-days: 90
