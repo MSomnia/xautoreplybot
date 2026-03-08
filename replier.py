@@ -36,7 +36,7 @@ def send_reply(
 
     for attempt in range(max_attempts):
         try:
-            response = client.create_tweet(text=text, reply={"in_reply_to_tweet_id": tweet_id})
+            response = client.create_tweet(text=text, in_reply_to_tweet_id=tweet_id)
             if response.data and response.data.get("id"):
                 return str(response.data["id"])
             raise ReplySendError("X API returned no reply tweet id")
