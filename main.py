@@ -48,7 +48,7 @@ def run() -> None:
                     model=settings.grok_model,
                     base_url=settings.grok_base_url,
                     system_prompt=settings.bot_system_prompt,
-                    tweet_text=tweet.text,
+                    tweet_text=tweet.context_text,
                     max_attempts=settings.max_generate_attempts,
                 )
                 validate_reply(
