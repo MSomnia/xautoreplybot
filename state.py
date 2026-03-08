@@ -48,9 +48,18 @@ def load_state(path: Path = STATE_FILE) -> BotState:
     with path.open("r", encoding="utf-8") as f:
         raw: dict[str, Any] = json.load(f)
 
-    replies = [ReplyRecord(**item) for item in raw.get("recent_replies", [])]
+    raw_since_id = raw.get("since_id")
+    since_id = str(raw_since_id) if raw_since_id is not None else None
+    replies = [
+        ReplyRecord(
+            tweet_id=str(item.get("tweet_id", "")),
+            reply_text=str(item.get("reply_text", "")),
+            time=str(item.get("time", "")),
+        )
+        for item in raw.get("recent_replies", [])
+    ]
     return BotState(
-        since_id=raw.get("since_id"),
+        since_id=since_id,
         last_run=raw.get("last_run"),
         recent_replies=replies,
     )

@@ -28,7 +28,7 @@ def get_new_tweets(*, bearer_token: str, user_id: str, since_id: str | None) -> 
 
     tweets = response.data or []
     items = [
-        Tweet(id=t.id, text=t.text, created_at=t.created_at.isoformat() if t.created_at else None)
+        Tweet(id=str(t.id), text=t.text, created_at=t.created_at.isoformat() if t.created_at else None)
         for t in tweets
     ]
     items.sort(key=lambda t: int(t.id))

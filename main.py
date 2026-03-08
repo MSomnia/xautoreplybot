@@ -18,6 +18,11 @@ logger = logging.getLogger(__name__)
 def run() -> None:
     settings = load_settings()
     state = load_state()
+    logger.info(
+        "Loaded state: since_id=%s, recent_replies=%s",
+        state.since_id,
+        len(state.recent_replies),
+    )
 
     tweets = get_new_tweets(
         bearer_token=settings.x_bearer_token,
@@ -25,12 +30,12 @@ def run() -> None:
         since_id=state.since_id,
     )
     if not tweets:
-        logger.info("No new tweets found")
+        logger.info("No new tweets found after since_id=%s", state.since_id)
         state.mark_run()
         save_state(state)
         return
 
-    logger.info("Fetched %s new tweets", len(tweets))
+    logger.info("Fetched %s new tweets: %s", len(tweets), [tweet.id for tweet in tweets])
 
     for tweet in tweets:
         logger.info("Processing tweet %s", tweet.id)
@@ -53,12 +58,13 @@ def run() -> None:
                 )
                 latest_valid_reply = candidate
                 break
-            except (ReplyGenerationError, ValidationError) as exc:
-                logger.warning("Reply attempt failed for tweet %s: %s", tweet.id, exc)
+            except ReplyGenerationError as exc:
+                logger.warning("Generation failed for tweet %s: %s", tweet.id, exc)
+            except ValidationError as exc:
+                logger.warning("Filter rejected reply for tweet %s: %s", tweet.id, exc)
 
         if latest_valid_reply is None:
             logger.error("Skip tweet %s because no valid reply generated", tweet.id)
-            state.since_id = tweet.id
             continue
 
         try:
