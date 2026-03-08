@@ -1,6 +1,6 @@
 # X Auto Reply Bot
 
-一个基于 Python + X API v2 + Gemini 的自动评论机器人。它会定时读取主账号的新推文，并使用 Bot 账号生成风格化回复。
+一个基于 Python + X API v2 + Gemini 的自动评论机器人。它在你手动触发 GitHub Actions 时读取主账号新推文，并使用 Bot 账号生成风格化回复。
 
 ## 功能
 
@@ -19,7 +19,7 @@
 - `filter.py`：审核回复
 - `replier.py`：发送回复
 - `state.py`：状态读写
-- `.github/workflows/reply-bot.yml`：定时工作流
+- `.github/workflows/reply-bot.yml`：手动触发工作流
 
 ## 环境变量
 
@@ -47,4 +47,4 @@ python main.py
 
 - 仓库中不保存系统提示词；请始终通过 `BOT_SYSTEM_PROMPT` 注入。
 - 初次运行 `state.json` 可保持默认空状态。
-- GitHub Actions `schedule` 触发存在分钟级延迟，属于正常行为。
+- 当前仅支持 `workflow_dispatch` 手动触发，不启用定时轮询。
