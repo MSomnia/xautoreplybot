@@ -14,9 +14,10 @@ class Settings:
     x_access_token: str
     x_access_token_secret: str
     x_bearer_token: str
-    gemini_api_key: str
+    grok_api_key: str
     bot_system_prompt: str
-    gemini_model: str = "gemini-2.0-flash"
+    grok_model: str = "grok-4.1"
+    grok_base_url: str = "https://api.x.ai/v1"
     max_generate_attempts: int = 3
     max_filter_attempts: int = 3
     recent_reply_window: int = 20
@@ -30,6 +31,11 @@ def _require_env(name: str) -> str:
     return value
 
 
+def _optional_env(name: str, default: str) -> str:
+    value = os.getenv(name)
+    return value if value else default
+
+
 def load_settings() -> Settings:
     """Load and validate all required environment variables."""
     return Settings(
@@ -39,6 +45,8 @@ def load_settings() -> Settings:
         x_access_token=_require_env("X_ACCESS_TOKEN"),
         x_access_token_secret=_require_env("X_ACCESS_TOKEN_SECRET"),
         x_bearer_token=_require_env("X_BEARER_TOKEN"),
-        gemini_api_key=_require_env("GEMINI_API_KEY"),
+        grok_api_key=_require_env("GROK_API_KEY"),
         bot_system_prompt=_require_env("BOT_SYSTEM_PROMPT"),
+        grok_model=_optional_env("GROK_MODEL", "grok-4.1"),
+        grok_base_url=_optional_env("GROK_BASE_URL", "https://api.x.ai/v1"),
     )

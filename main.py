@@ -39,8 +39,9 @@ def run() -> None:
         for _ in range(settings.max_filter_attempts):
             try:
                 candidate = generate_reply(
-                    api_key=settings.gemini_api_key,
-                    model=settings.gemini_model,
+                    api_key=settings.grok_api_key,
+                    model=settings.grok_model,
+                    base_url=settings.grok_base_url,
                     system_prompt=settings.bot_system_prompt,
                     tweet_text=tweet.text,
                     max_attempts=settings.max_generate_attempts,

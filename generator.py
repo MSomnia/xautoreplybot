@@ -1,10 +1,10 @@
-"""Gemini-based reply generator."""
+"""Grok-based reply generator."""
 
 from __future__ import annotations
 
 import time
 
-from google import genai
+from openai import OpenAI
 
 USER_PROMPT_TEMPLATE = """以下是博主刚发布的推文，请以你的风格进行评论回复：
 
@@ -23,26 +23,31 @@ def generate_reply(
     *,
     api_key: str,
     model: str,
+    base_url: str,
     system_prompt: str,
     tweet_text: str,
     max_attempts: int = 3,
     base_backoff_seconds: float = 1.0,
 ) -> str:
-    client = genai.Client(api_key=api_key)
+    client = OpenAI(api_key=api_key, base_url=base_url)
     user_prompt = USER_PROMPT_TEMPLATE.format(tweet_text=tweet_text)
     last_error: Exception | None = None
 
     for attempt in range(max_attempts):
         try:
-            response = client.models.generate_content(
+            response = client.chat.completions.create(
                 model=model,
-                config={"system_instruction": system_prompt},
-                contents=user_prompt,
+                temperature=0.8,
+                max_tokens=220,
+                messages=[
+                    {"role": "system", "content": system_prompt},
+                    {"role": "user", "content": user_prompt},
+                ],
             )
-            text = (response.text or "").strip()
+            text = (response.choices[0].message.content or "").strip()
             if text:
                 return text
-            raise ReplyGenerationError("Gemini returned empty response text")
+            raise ReplyGenerationError("Grok returned empty response text")
         except Exception as exc:  # noqa: BLE001
             last_error = exc
             if attempt == max_attempts - 1:

@@ -1,11 +1,11 @@
 # X Auto Reply Bot
 
-一个基于 Python + X API v2 + Gemini 的自动评论机器人。它在你手动触发 GitHub Actions 时读取主账号新推文，并使用 Bot 账号生成风格化回复。
+一个基于 Python + X API v2 + Grok 的自动评论机器人。它在你手动触发 GitHub Actions 时读取主账号新推文，并使用 Bot 账号生成风格化回复。
 
 ## 功能
 
 - 拉取主账号新推文（增量，基于 `since_id`）
-- 通过 Gemini 生成评论
+- 通过 Grok 生成评论
 - 进行内容过滤（长度、敏感词、重复度）
 - 使用 Bot 账号回复原推文
 - `state.json` 持久化运行状态，配合 GitHub Actions Artifact 跨运行保存
@@ -31,8 +31,13 @@
 - `X_ACCESS_TOKEN`
 - `X_ACCESS_TOKEN_SECRET`
 - `X_BEARER_TOKEN`
-- `GEMINI_API_KEY`
+- `GROK_API_KEY`
 - `BOT_SYSTEM_PROMPT`
+
+可选环境变量：
+
+- `GROK_MODEL`（默认 `grok-4.1`）
+- `GROK_BASE_URL`（默认 `https://api.x.ai/v1`）
 
 ## 本地运行
 
